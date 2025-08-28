@@ -62,7 +62,7 @@ class _EclairageState extends State<Eclairage> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -75,14 +75,14 @@ class _EclairageState extends State<Eclairage> {
                   children: [
                     Text(
                       "Contrôle d'éclairage",
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                            fontSize: 24,
-                            letterSpacing: 0.002,
-                            // fontFamily: 'Times New Roman',
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                fontSize: 24,
+                                letterSpacing: 0.002,
+                                // fontFamily: 'Times New Roman',
+                              ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -117,16 +117,16 @@ class _EclairageState extends State<Eclairage> {
                       ),
                     ),
                     onPressed: () => toggleAll(true),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.lightbulb, color: Colors.white),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Text(
                             "Tout allumer",
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                             ),
@@ -136,7 +136,7 @@ class _EclairageState extends State<Eclairage> {
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 // Button allumer tout
                 Expanded(
                   child: ElevatedButton(
@@ -151,16 +151,16 @@ class _EclairageState extends State<Eclairage> {
                       ),
                     ),
                     onPressed: () => toggleAll(false),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.power_settings_new, color: Colors.white),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Text(
                             "Tout éteindre",
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                             ),
@@ -255,14 +255,14 @@ class _EclairageState extends State<Eclairage> {
                                           ),
                                           child: Text(
                                             light["label"],
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ),
                                         Switch(
-                                          activeColor: Colors.blue,
+                                          activeThumbColor: Colors.blue,
                                           value: light["on"],
                                           onChanged: (value) {
                                             setState(() {
@@ -278,7 +278,7 @@ class _EclairageState extends State<Eclairage> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 12),
+                                    const SizedBox(height: 12),
                                     if (light["on"])
                                       Slider(
                                         value: light["brightness"].toDouble(),

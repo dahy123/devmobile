@@ -4,6 +4,7 @@ import 'package:devmobile/view/camera.dart';
 import 'package:devmobile/view/eclairage.dart';
 import 'package:devmobile/view/parametre.dart';
 import '../widget/navigation.dart';
+import 'notification.dart';
 
 class Accueil extends StatefulWidget {
   const Accueil({super.key});
@@ -55,7 +56,13 @@ class _AccueilState extends State<Accueil> {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.notifications),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const NotificationPage()));
+                      },
                       color: Colors.blue,
                       iconSize: 40,
                     ),

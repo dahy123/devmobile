@@ -1,10 +1,10 @@
+import 'package:devmobile/view/accueil.dart';
+import 'package:devmobile/view/appel.dart';
+import 'package:devmobile/view/camera.dart';
+import 'package:devmobile/view/eclairage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../widget/navigation.dart';
-import 'accueil.dart';
-import 'appel.dart';
-import 'camera.dart';
-import 'eclairage.dart';
 
 class Parametre extends StatefulWidget {
   const Parametre({super.key});
@@ -16,201 +16,267 @@ class Parametre extends StatefulWidget {
 class _ParametreState extends State<Parametre> {
   int _currentIndex = 4;
 
-  bool isDarkMode = false;
-  bool isNotificationEnabled = true;
-  bool isBiometricEnabled = false;
-  bool isAutoConnectESP = true;
+  // Connectivité
+  bool isWifiEnabled = true;
+  bool isBluetoothEnabled = true;
 
+  // Notifications
+  bool isPushAlert = true;
+  bool isSmsAlert = true;
+
+  // Réseau
+  final TextEditingController ssidController =
+      TextEditingController(text: "MONWIFI");
+  final TextEditingController passwordController =
+      TextEditingController(text: "********");
+  final TextEditingController deviceController =
+      TextEditingController(text: "ESP32_Domotique");
+
+  // Compte utilisateur
+  final TextEditingController emailController =
+      TextEditingController(text: "user@example.com");
+  final TextEditingController passController =
+      TextEditingController(text: "******");
+  final TextEditingController confPassController =
+      TextEditingController(text: "******");
+
+  // ESP32 Config
   String espIp = "192.168.4.1";
   String espPort = "80";
-  String espName = "SMART-MG-ESP";
 
   Future<void> sendCommandToESP32(String command) async {
     final uri = Uri.parse("http://$espIp:$espPort/$command");
     try {
       final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        print("Commande envoyée : ${response.body}");
-      } else {
-        print("Erreur ESP32 : ${response.statusCode}");
-      }
+      final message = response.statusCode == 200
+          ? "Commande envoyée avec succès"
+          : "Erreur ESP32 : ${response.statusCode}";
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     } catch (e) {
-      print("Échec de connexion ESP32 : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Échec de connexion ESP32 : $e")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          "Paramètres",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            const Text(
+              "Configuration",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              "Paramètres de système et préférences",
+              style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300),
+            ),
+            const SizedBox(height: 24),
+
+            // Connectivité
+            const Text(
+              "Connectivité",
+              style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Card(
+                child: Column(
+              children: [
+                _buildCardSwitch(
+                  icon: Icons.wifi,
+                  iconColor: Color(0xFF2571E7),
+                  title: "WiFi",
+                  subtitle: "Connexion réseau sans fil",
+                  value: isWifiEnabled,
+                  onChanged: (val) => setState(() => isWifiEnabled = val),
+                  espCommand: "wifi",
+                ),
+                _buildCardSwitch(
+                  icon: Icons.bluetooth,
+                  iconColor: Color(0xFF0ED584),
+                  title: "Bluetooth",
+                  subtitle: "Connexion locale ESP32",
+                  value: isBluetoothEnabled,
+                  onChanged: (val) => setState(() => isBluetoothEnabled = val),
+                  espCommand: "bluetooth",
+                ),
+              ],
+            )),
+            const SizedBox(height: 24),
+            // Configuration du réseau
+            const Text(
+              "Configuration du réseau",
+              style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _buildTextField("Nom du réseau WiFi (SSID)", ssidController),
+            _buildTextField("Mot de passe WiFi", passwordController,
+                obscureText: true),
+            _buildTextField("Nom du dispositif", deviceController),
+
+            const SizedBox(height: 24),
+            // Notifications
+            const Text(
+              "Notifications",
+              style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  _buildCardSwitch(
+                    icon: Icons.notifications,
+                    iconColor: Color(0xFFFF7245),
+                    title: "Alert",
+                    subtitle: "Notification de push",
+                    value: isPushAlert,
+                    onChanged: (val) => setState(() => isPushAlert = val),
+                  ),
+                  _buildCardSwitch(
+                    icon: Icons.sms,
+                    iconColor: Color(0xFF0B1B41),
+                    title: "SMS",
+                    subtitle: "Alerte via une notification SMS",
+                    value: isSmsAlert,
+                    onChanged: (val) => setState(() => isSmsAlert = val),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Compte utilisateur
+            const Text(
+              "Compte d’utilisateur",
+              style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _buildTextField("Email", emailController),
+            _buildTextField("Mot de passe", passController),
+            _buildTextField("Confirmer votre mot de passe", confPassController),
+
+            const SizedBox(
+              height: 4,
+            ),
+
+            const SizedBox(height: 16),
+            // Sauvegarder
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF2571E7),
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12))),
+              onPressed: () {
+                // Sauvegarde des paramètres
+              },
+              child: const Text(
+                "Sauvegarder les paramètres",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.blueGrey,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const SizedBox(height: 12),
-          _buildSectionTitle("Compte"),
-          _buildTile("Nom", "Oldon", Icons.person),
-          _buildTile("Email", "oldon@smart-mg.org", Icons.email),
-          _buildTile("Mot de passe", "••••••••", Icons.lock),
-
-          const SizedBox(height: 24),
-          _buildSectionTitle("Connexion"),
-          _buildSwitchTile("WiFi", true, Icons.wifi, (val) {}),
-          _buildSwitchTile("Bluetooth", false, Icons.bluetooth, (val) {}),
-
-          const SizedBox(height: 24),
-          _buildSectionTitle("Notifications"),
-          _buildSwitchTile(
-            "Activer les notifications",
-            isNotificationEnabled,
-            Icons.notifications,
-            (val) {
-              setState(() => isNotificationEnabled = val);
-            },
-          ),
-
-          const SizedBox(height: 24),
-          _buildSectionTitle("Apparence"),
-          _buildSwitchTile("Mode sombre", isDarkMode, Icons.dark_mode, (val) {
-            setState(() => isDarkMode = val);
-          }),
-
-          const SizedBox(height: 24),
-          _buildSectionTitle("Sécurité"),
-          _buildSwitchTile(
-            "Verrouillage biométrique",
-            isBiometricEnabled,
-            Icons.fingerprint,
-            (val) {
-              setState(() => isBiometricEnabled = val);
-            },
-          ),
-
-          const SizedBox(height: 24),
-          _buildSectionTitle("ESP32"),
-          _buildTile("Adresse IP", espIp, Icons.router),
-          _buildTile("Port", espPort, Icons.settings_ethernet),
-          _buildTile("Nom du module", espName, Icons.memory),
-          _buildSwitchTile(
-            "Connexion automatique",
-            isAutoConnectESP,
-            Icons.autorenew,
-            (val) {
-              setState(() => isAutoConnectESP = val);
-            },
-          ),
-          ElevatedButton.icon(
-            onPressed: () => sendCommandToESP32("test"),
-            icon: const Icon(Icons.send),
-            label: const Text("Tester la connexion ESP32"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () {
-              // Action de déconnexion ou sauvegarde
-            },
-            icon: const Icon(Icons.exit_to_app),
-            label: const Text("Déconnexion"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ],
       ),
       bottomNavigationBar: ButtonNavigation(
         currentIndex: _currentIndex,
-        onItemSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          switch (index) {
-            case 0:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Accueil()),
-              );
-              break;
-            case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Eclairage()),
-              );
-              break;
-            case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Camera()),
-              );
-            case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Appel()),
-              );
-            case 4:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Parametre()),
-              );
-            default:
-          }
-        },
+        onItemSelected: _onItemSelected,
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Colors.blueGrey,
+  void _onItemSelected(int index) {
+    setState(() => _currentIndex = index);
+
+    final pages = [
+      const Accueil(),
+      const Eclairage(),
+      const Camera(),
+      const Appel(),
+      const Parametre(),
+    ];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => pages[index]),
+    );
+  }
+
+  Widget _buildCardSwitch({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required Function(bool) onChanged,
+    String? espCommand,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.black87, fontWeight: FontWeight.bold)),
+                Text(subtitle,
+                    style:
+                        const TextStyle(color: Colors.black54, fontSize: 12)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Switch(
+            activeColor: Color(0xFF2571E7),
+            value: value,
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildTile(String label, String value, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.blue),
-      title: Text(label),
-      subtitle: Text(value),
-      trailing: const Icon(Icons.edit, color: Colors.grey),
-      onTap: () {
-        // Naviguer vers une page de modification
-      },
-    );
-  }
-
-  Widget _buildSwitchTile(
-    String label,
-    bool value,
-    IconData icon,
-    Function(bool) onChanged,
-  ) {
-    return SwitchListTile(
-      secondary: Icon(icon, color: Colors.teal),
-      title: Text(label),
-      value: value,
-      onChanged: onChanged,
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool obscureText = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+      ),
     );
   }
 }

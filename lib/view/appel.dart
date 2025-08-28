@@ -16,105 +16,128 @@ class Appel extends StatefulWidget {
 class _AppelState extends State<Appel> {
   int _currentIndex = 3;
 
+  final List<Map<String, dynamic>> personalContacts = [
+    {"label": "Maison", "number": "+261327654678"},
+    {"label": "Bureau", "number": "+261327654678"},
+  ];
+
+  final List<Map<String, dynamic>> emergencyContacts = [
+    {"label": "Police", "number": "605", "icon": Icons.local_police},
+    {
+      "label": "Pompier",
+      "number": "+261327654678",
+      "icon": Icons.fire_extinguisher
+    },
+    {
+      "label": "SAMU",
+      "number": "+261327654678",
+      "icon": Icons.medical_services
+    },
+  ];
+
   void _callNumber(String number) async {
     final Uri url = Uri(scheme: 'tel', path: number);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      // Gérer l'erreur si nécessaire
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Impossible d'appeler ce numéro")),
+      );
     }
   }
 
   void _onItemSelected(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    setState(() => _currentIndex = index);
 
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const Accueil()),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const Eclairage()),
-        );
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const Camera()),
-        );
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const Appel()),
-        );
-        break;
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const Parametre()),
-        );
-        break;
-    }
+    final pages = [
+      const Accueil(),
+      const Eclairage(),
+      const Camera(),
+      const Appel(),
+      const Parametre(),
+    ];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => pages[index]),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Appel d'urgence"),
-        centerTitle: true,
-        backgroundColor: Colors.red.shade700,
-        automaticallyImplyLeading: false,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 24,
+            // En-tête fixe
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Appel d'urgence",
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                fontSize: 24,
+                              ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Contactez rapide vos proches ou service d'urgence",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Bouton fixe
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () => _callNumber("+261327654678"),
+                icon: const Icon(Icons.call, size: 24, color: Colors.white),
+                label: const Text(
+                  "Appel Rapide Maison",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
-              onPressed: () => _callNumber("+261327654678"),
-              icon: const Icon(Icons.call, size: 28),
-              label: const Text(
-                "Appel Rapide Maison",
-                style: TextStyle(fontSize: 18),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Liste scrollable
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildSection("Contacts personnels", personalContacts,
+                      defaultIcon: Icons.home),
+                  const SizedBox(height: 24),
+                  _buildSection("Services d'urgence", emergencyContacts,
+                      defaultIcon: Icons.local_hospital),
+                ],
               ),
-            ),
-            const SizedBox(height: 24),
-            _buildSectionTitle("Contacts personnels"),
-            _buildContactTile("Maison", "+261327654678"),
-            _buildContactTile("Bureau", "+261327654678"),
-            const SizedBox(height: 24),
-            _buildSectionTitle("Services d'urgence"),
-            _buildContactTile(
-              "Police",
-              "+261327654678",
-              icon: Icons.local_police,
-            ),
-            _buildContactTile(
-              "Pompier",
-              "+261327654678",
-              icon: Icons.fire_extinguisher,
-            ),
-            _buildContactTile(
-              "SAMU",
-              "+261327654678",
-              icon: Icons.medical_services,
             ),
           ],
         ),
@@ -126,21 +149,39 @@ class _AppelState extends State<Appel> {
     );
   }
 
+  Widget _buildSection(String title, List<Map<String, dynamic>> contacts,
+      {required IconData defaultIcon}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(title),
+        ...contacts.map((c) => _buildContactTile(
+              c['label'],
+              c['number'],
+              icon: c.containsKey('icon') ? c['icon'] : defaultIcon,
+            )),
+      ],
+    );
+  }
+
   Widget _buildSectionTitle(String title) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          const Icon(Icons.person, color: Colors.blue, size: 20),
+          const SizedBox(width: 4),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildContactTile(
-    String label,
-    String number, {
-    IconData icon = Icons.call,
-  }) {
+  Widget _buildContactTile(String label, String number,
+      {required IconData icon}) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(

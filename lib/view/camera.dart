@@ -8,7 +8,7 @@ import 'eclairage.dart';
 import 'parametre.dart';
 
 class Camera extends StatefulWidget {
-  const Camera({Key? key}) : super(key: key);
+  const Camera({super.key});
 
   @override
   State<Camera> createState() => _CameraState();
@@ -38,11 +38,12 @@ class _CameraState extends State<Camera> {
       appBar: AppBar(
         title: const Text(
           "Caméra ",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
           textAlign: TextAlign.start,
         ),
         centerTitle: true,
-        // backgroundColor: Colors.black87,
+        backgroundColor: Colors.blue,
         automaticallyImplyLeading: false,
       ),
       body: ListView(
@@ -154,8 +155,8 @@ class _CameraState extends State<Camera> {
                 cameraNames[selectedCameraIndex],
                 style: const TextStyle(color: Colors.black),
               ),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.circle, color: Colors.red, size: 12),
                   SizedBox(width: 6),
                   Text("En direct", style: TextStyle(color: Colors.black54)),

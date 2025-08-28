@@ -25,13 +25,13 @@ class _NotificationPageState extends State<NotificationPage> {
       "time": "il y a 19 min",
       "icon": Icons.local_fire_department,
     },
-    {
-      "type": "Porte",
-      "title": "Porte d’entrée ouverte",
-      "subtitle": "Entrée - 14:32",
-      "time": "il y a 12 min",
-      "icon": Icons.door_front_door,
-    },
+    // {
+    //   "type": "Porte",
+    //   "title": "Porte d’entrée ouverte",
+    //   "subtitle": "Entrée - 14:32",
+    //   "time": "il y a 12 min",
+    //   "icon": Icons.door_front_door,
+    // },
   ];
 
   List<Map<String, dynamic>> get filteredNotifications {
@@ -43,13 +43,16 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notifications"),
+        title: const Text(
+          "Notifications",
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _buildFilterBar(),
           const Divider(),
           Expanded(
@@ -58,7 +61,7 @@ class _NotificationPageState extends State<NotificationPage> {
               itemBuilder: (context, index) {
                 final notif = filteredNotifications[index];
                 return ListTile(
-                  leading: Icon(notif["icon"], color: Colors.orange),
+                  leading: Icon(notif["icon"], color: Colors.blue),
                   title: Text(notif["title"]),
                   subtitle: Text(notif["subtitle"]),
                   trailing: Text(
@@ -78,7 +81,12 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Widget _buildFilterBar() {
-    final filters = ["Tout", "Non lue", "Mouvement", "Gaz", "Porte"];
+    final filters = [
+      "Tout",
+      "Non lue",
+      "Mouvement",
+      "Gaz",
+    ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -91,7 +99,7 @@ class _NotificationPageState extends State<NotificationPage> {
               label: Text(filter),
               selected: isSelected,
               onSelected: (_) => setState(() => selectedFilter = filter),
-              selectedColor: Colors.deepPurple,
+              selectedColor: Colors.blue,
               labelStyle: TextStyle(
                 color: isSelected ? Colors.white : Colors.black,
               ),
